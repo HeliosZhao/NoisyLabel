@@ -11,8 +11,8 @@ from torch.backends import cudnn
 import time
 from datetime import timedelta
 
-from trainer import Trainer
-from dataset import NOISE_CIFAR10
+from trainer import CleanNetTrainer
+from dataset import NOISE_CIFAR10, IterLoader
 from model import Net, CleanNet
 from utils import save_checkpoint, Logger
 from loss import NoisyLabelLoss
@@ -33,18 +33,18 @@ def get_data(args):
 
     trainset = NOISE_CIFAR10(
         root=args.root, train=True, noise_rate=args.eta, transform=transform_train)
-
+    iters = len(trainset.data) // args.batch_size
     sampler = RandomMultipleSampler(trainset, args.num_instances)
 
-    trainloader = torch.utils.data.DataLoader(
-        trainset, batch_size=args.batch_size, sampler=sampler, shuffle=False, num_workers=args.workers)
+    trainloader = IterLoader(torch.utils.data.DataLoader(
+        trainset, batch_size=args.batch_size, sampler=sampler, shuffle=False, num_workers=args.workers))
 
     testset = NOISE_CIFAR10(
         root=args.root, train=False, transform=transform_test)
     testloader = torch.utils.data.DataLoader(
         testset, batch_size=args.batch_size, shuffle=False, num_workers=args.workers)
 
-    return trainloader, testloader
+    return trainloader, testloader, iters
 
 def main():
     args = parser.parse_args()
@@ -85,7 +85,7 @@ def main_worker(args):
 
     lr_scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=40, gamma=0.1)
 
-    train_loader, test_loader = get_data(args)
+    train_loader, test_loader, train_iters = get_data(args)
 
     if args.resume:
         print("=> loading checkpoint '{}'".format(args.resume))
@@ -105,7 +105,7 @@ def main_worker(args):
     elif args.loss == 'ce':
         criterion = nn.CrossEntropyLoss()
 
-    trainer = Trainer(args, model, criterion)
+    trainer = CleanNetTrainer(args, model, criterion)
     if args.evaluate:
         accuracy = trainer.inference(test_loader)
         print(' Evaluate Accuracy : {:5.2%}'.format(accuracy))
@@ -115,7 +115,7 @@ def main_worker(args):
         print('==> start training epoch {}'.format(epoch))
         torch.cuda.empty_cache()
         print(' learning rate = ', optimizer.param_groups[0]['lr'])
-        trainer.train(train_loader, optimizer, epoch)
+        trainer.train(train_loader, optimizer, epoch, train_iters)
 
         lr_scheduler.step(epoch+1)
 

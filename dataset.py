@@ -3,7 +3,28 @@ from PIL import Image
 import os
 import pickle
 import numpy as np
+import copy
 
+class IterLoader:
+    def __init__(self, loader, length=None):
+        self.loader = loader
+        self.length = length
+        self.iter = None
+
+    def __len__(self):
+        if self.length is not None:
+            return self.length
+        return len(self.loader)
+
+    def new_epoch(self):
+        self.iter = iter(self.loader)
+
+    def next(self):
+        try:
+            return next(self.iter)
+        except:
+            self.iter = iter(self.loader)
+            return next(self.iter)
 
 class NOISE_CIFAR10(torch.utils.data.Dataset):
 
@@ -55,7 +76,7 @@ class NOISE_CIFAR10(torch.utils.data.Dataset):
 
         self.data = np.vstack(self.data).reshape((-1, 3, 32, 32))
         self.data = self.data.transpose((0, 2, 3, 1))  # convert to HWC
-
+        self.true_labels = copy.deepcopy(self.targets)
         if self.train:
             if noise_rate > 0:
                 n_samples = len(self.targets)
@@ -93,7 +114,7 @@ class NOISE_CIFAR10(torch.utils.data.Dataset):
         return other_class
 
     def __getitem__(self, index):
-        img, target = self.data[index], self.targets[index]
+        img, target, true_label = self.data[index], self.targets[index], self.true_labels[index]
 
         # doing this so that it is consistent with all other datasets
         # to return a PIL Image
@@ -105,7 +126,7 @@ class NOISE_CIFAR10(torch.utils.data.Dataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        return img, target
+        return img, target, true_label
 
     def __len__(self):
         return len(self.data)

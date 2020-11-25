@@ -103,11 +103,13 @@ class CleanNet(nn.Module):
 
         x = x.view(x.size(0), -1)
         x = self.fc1(x)
-        x = self.CleanSelect(x)
-        x = self.fc2(x)
-        # prob = self.softmax(x)
-
-        return x
+        if self.training:
+            x, clean_indices = self.CleanSelect(x)
+            x = self.fc2(x)
+            return x, clean_indices
+        else:
+            x = self.fc2(x)
+            return x
 
     def _init_params(self):
         for m in self.modules():
