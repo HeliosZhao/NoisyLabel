@@ -1,0 +1,17 @@
+CUDA_VISIBLE_DEVICES=2 python main.py \
+-l ce --eval-step 1 --eta 0.2 \
+--logs-dir logs/baseline_2_1
+
+CUDA_VISIBLE_DEVICES=0 python main.py \
+-l sl --seed 2 --eval-step 1 --eta 0.6 \
+--logs-dir logs/CSE_6_2
+
+CUDA_VISIBLE_DEVICES=3 python main.py \
+-l sl --eval-step 1 --eta 0.2 \
+--logs-dir logs/CSE_2_1
+
+
+##REA
+CUDA_VISIBLE_DEVICES=1 python mainREA.py \
+-l sl --seed 1 --eval-step 1 --eta 0.6 \
+--logs-dir logs/CSEREA_6_1
