@@ -126,7 +126,7 @@ class NOISE_CIFAR10(torch.utils.data.Dataset):
         if self.target_transform is not None:
             target = self.target_transform(target)
 
-        return img, target, true_label
+        return img, target #, true_label
 
     def __len__(self):
         return len(self.data)
