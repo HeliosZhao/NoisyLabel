@@ -12,7 +12,7 @@ import time
 from datetime import timedelta
 
 from trainer import Trainer
-from Dataset import NOISE_CIFAR10
+from dataset import NOISE_CIFAR10
 from model import Net, CleanNet
 from utils import save_checkpoint, Logger
 from loss import NoisyLabelLoss
