@@ -11,11 +11,11 @@ from torch.backends import cudnn
 import time
 from datetime import timedelta
 
-from trainer import Trainer
+from trainer import Trainer, SmallLossTrainer
 from dataset import NOISE_CIFAR10
 from model import Net
 from utils import save_checkpoint, Logger
-from loss import NoisyLabelLoss
+from loss import NoisyLabelLoss, SmallLoss
 
 
 def get_data(args):
@@ -99,10 +99,14 @@ def main_worker(args):
 
     if args.loss == 'sl':
         criterion = NoisyLabelLoss(args)
-    elif args.loss == 'ce':
+        trainer = Trainer(args, model, criterion)
+    elif args.loss == 'small':
+        criterion = SmallLoss(args)
+        trainer = SmallLossTrainer(args, model, criterion)
+    else:
         criterion = nn.CrossEntropyLoss()
+        trainer = Trainer(args, model, criterion)
 
-    trainer = Trainer(args, model, criterion)
     if args.evaluate:
         accuracy = trainer.inference(test_loader)
         print(' Evaluate Accuracy : {:5.2%}'.format(accuracy))
@@ -165,6 +169,7 @@ if __name__ == '__main__':
     parser.add_argument('--alpha', type=float, default=0.1)
     parser.add_argument('--beta', type=float, default=1.)
     parser.add_argument('--A', type=int, default=-4)
+    parser.add_argument('--T', type=float, default=10.)
     # parser.add_argument('--CES', action='store_true',
     #                     help="use CES loss")
 

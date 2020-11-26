@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from cleanselect import CleanSelect
 
 def conv_3x3(in_planes, out_planes, stride=1):
     return nn.Sequential(

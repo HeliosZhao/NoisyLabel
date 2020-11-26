@@ -2,8 +2,6 @@ import torch
 import time
 import torch.nn as nn
 from utils import AverageMeter, accuracy
-import cv2
-import os
 
 class Trainer(object):
     def __init__(self, args, model, criterion):
