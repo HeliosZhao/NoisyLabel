@@ -99,13 +99,14 @@ def main_worker(args):
 
     if args.loss == 'sl':
         criterion = NoisyLabelLoss(args)
+        trainer = Trainer(args, model, criterion)
     elif args.loss == 'small':
         criterion = SmallLoss(args)
+        trainer = SmallLossTrainer(args, model, criterion)
     else:
         criterion = nn.CrossEntropyLoss()
+        trainer = Trainer(args, model, criterion)
 
-
-    trainer = SmallLossTrainer(args, model, criterion)
     if args.evaluate:
         accuracy = trainer.inference(test_loader)
         print(' Evaluate Accuracy : {:5.2%}'.format(accuracy))
