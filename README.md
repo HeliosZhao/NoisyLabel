@@ -1,5 +1,6 @@
 # NoisyLabel
 
+This is the code for CVML NoisyLabel Test case.
 
 ## How to Run
 
@@ -18,7 +19,7 @@ python main.py -l sl --eta 0.6 --evaluate --resume "your checkpoint path" [--dat
 ```
 
 ## Results on CIFAR10
-Result of best Epoch
+The average accuracy of 5 random runs.
 | noise rate  | 0.0 | 0.2  | 0.4 | 0.6 | 0.8 |
 | ------------------- |:---:|:---:|:---:|:---:|:---:|
 | Baseline    |91.73|84.05|79.29|70.91|44.24|
