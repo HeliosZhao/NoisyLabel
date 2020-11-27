@@ -14,7 +14,7 @@ python main.py -l sl --eta 0.6 [--data-dir ./data] [--logs-dir ./logs]
 ### Test
 ```console
 
-python main.py -l sl --eta 0.6 --evaluate --resume "your checkpoint path" [--data-dir ./data] [--logs-dir ./logs]
+python main.py --evaluate --resume "your checkpoint path" [--data-dir ./data] [--logs-dir ./logs]
 
 ```
 
